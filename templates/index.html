@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MNIST Image Upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="card">
+    <p class="eyebrow">MNIST Digit Predictor</p>
+    <h2>Upload a Handwritten Digit (0-9)</h2>
+
+    <input type="file" id="fileInput" accept="image/*">
+
+    <img id="preview" alt="Digit preview">
+
+    <button onclick="predict()">Predict</button>
+
+    <h2 id="result">Result: -</h2>
+</main>
+
+<script>
+document.getElementById("fileInput").onchange = function(event) {
+    let reader = new FileReader();
+    reader.onload = function() {
+        document.getElementById("preview").src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+};
+
+function predict() {
+    let fileInput = document.getElementById("fileInput");
+    let file = fileInput.files[0];
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/predict", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerText =
+            "Result: " + data.prediction;
+    });
+}
+</script>
+
+</body>
+</html>
